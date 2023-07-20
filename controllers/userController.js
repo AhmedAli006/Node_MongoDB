@@ -3,7 +3,9 @@ const User = require("../model/Users");
 // Get All users
 const user_all = async (req, res) => {
     try {
-        const users = await user.find();
+        const users = await User.find();
+    //     const emails = users.map((user) => user.email);
+    // res.json(emails);
         res.json(users);
       } catch (error) {
         res.json({ message: error });
@@ -11,9 +13,9 @@ const user_all = async (req, res) => {
 };
 
 // Single user
-const user_details = async (req, res) => {
+const user_login = async (req, res) => {
     try {
-        const user = await user.findById(req.params.userId);
+        const user = await User.findById(req.params.userId);
         res.json(user);
       } catch (error) {
         res.json({ message: error });
@@ -21,7 +23,7 @@ const user_details = async (req, res) => {
 };
 
 // Add New user
-const user_create = async (req, res) => {
+const user_signup = async (req, res) => {
     const user = new User({
         name: req.body.name,
         email: req.body.email,
@@ -45,7 +47,7 @@ const user_update = async (req, res) => {
         password: req.body.password,
       });
     
-        const updateduser = await user.findByIdAndUpdate(
+        const updateduser = await User.findByIdAndUpdate(
           { _id: req.params.userId },
           user
         );
@@ -58,7 +60,7 @@ const user_update = async (req, res) => {
 // Delete user
 const user_delete = async (req, res) => {
     try {
-        const removeuser = await user.findByIdAndDelete(req.params.userId);
+        const removeuser = await User.findByIdAndDelete(req.params.userId);
         res.json(removeuser);
       } catch (error) {
         res.json({ message: error });
@@ -67,8 +69,8 @@ const user_delete = async (req, res) => {
 
 module.exports = {
     user_all, 
-    user_details, 
-    user_create, 
+    user_login, 
+    user_signup, 
     user_update, 
     user_delete
   }
