@@ -1,5 +1,7 @@
 const User = require("../model/Users");
 
+const bcrypt = require("bcryptjs");
+
 // Get All users
 const user_all = async (req, res) => {
     try {
@@ -13,7 +15,7 @@ const user_all = async (req, res) => {
 };
 
 // Single user
-const user_login = async (req, res) => {
+const user_details = async (req, res) => {
     try {
         const user = await User.findById(req.params.userId);
         res.json(user);
@@ -23,20 +25,31 @@ const user_login = async (req, res) => {
 };
 
 // Add New user
+
+
 const user_signup = async (req, res) => {
-    const user = new User({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
-      });
+  const { name, email, password } = req.body;
+
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(403).json({ message: "This Email is Already Exist" });
+    }
+
+    // Hash the password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({ name, email, password: hashedPassword });
+    const savedUser = await newUser.save();
     
-      try {
-        const saveduser = await user.save();
-        res.send(saveduser);
-      } catch (error) {
-        res.status(400).send(error);
-      }
+    return res.json(savedUser);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
 };
+
+
+
 
 // Update user
 const user_update = async (req, res) => {
@@ -66,11 +79,12 @@ const user_delete = async (req, res) => {
         res.json({ message: error });
       }
 };
+    // user_login, 
 
 module.exports = {
     user_all, 
-    user_login, 
     user_signup, 
     user_update, 
-    user_delete
+    user_delete,
+    user_details
   }
